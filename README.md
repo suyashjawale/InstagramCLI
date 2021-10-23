@@ -1,0 +1,472 @@
+# InstagramCLI 
+InstagramCLI is the most advanced scraping library made by reverse-engineering the Instagram API calls which has low latency and prevents you from getting blocked.
+InstagramCLI can be used as a data-gathering tool for data science and osint practices.
+
+[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/) 
+#####
+[![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)](https://www.python.org/downloads/release/python-360/)   [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)   [![Python 3.8](https://img.shields.io/badge/python-3.8-red.svg)](https://www.python.org/downloads/release/python-380/) [![Python 3.9](https://img.shields.io/badge/python-3.9-violet.svg)](https://www.python.org/downloads/release/python-390/) [![Python 3.10](https://img.shields.io/badge/python-3.10-green.svg)](https://www.python.org/downloads/release/python-3100/)
+
+#### Checkout repo 
+[![forthebadge made-with-python](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/suyashjawale/InstagramCLI) 
+
+## Installation
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install InstagramCLI.
+```bash
+pip install InstagramCLI
+```
+##### Limitations 
+- **Selenium dependency** - Current version supports chrome browser only    
+- **Platform dependant** - Supports windows only
+- **Next update** will remove browser and platform dependency
+## Documentation and Usage
+
+
+
+### 1. get_user_info()
+#
+```python
+get_user_info(target_username,save_to_device=False)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_to_device     | Save response to json file | **True** or **False** | **False**      |
+
+### Response
+```
+{
+    "user_id": string,                     // Instagram id of user
+    "username": string,                    // Instagram username of user
+    "full_name": string,                   // Instagram name of user
+    "following_count": int,                // Following count of user
+    "follower_count": int,                 // Follower count of user
+    "private": boolean,                    // Account is private= True else False
+    "verified": boolean,                   // Account is verified=True else False
+    "bio": string,                         // Bio text
+    "category_name": string,               // Person category name
+    "profile_pic_url": string,             // Tiny url link
+    "bio_url": string,                     // Website link  
+    "follows_you": boolean,                // If the user follows you
+    "fb_id": string,                       // Facebook profile id
+    "you_follow": boolean,                 // If you follow the user
+    "highlights_count": int,               // Number of highlights present on profile
+    "professional_account": boolean,       // If the account is professional account
+    "posts_count": int,                    // Number of posts on account
+    "igtv_count": int                      // Number of igtv videos on account
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_user_info(target_username="instagram",save_to_device=True)
+cli.close()
+```
+####
+_________________________
+
+### 2. get_followers()
+#
+```python
+get_followers(target_username, save_to_file=False)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_to_device     | Save followers list to json file | **True** or **False** | **False**      |
+
+### Response
+```
+#List of dictionaries
+[
+    {
+        "pk": int,                                    // Instagram Id of user
+        "username": string,                           // Instagram Username 
+        "full_name": string,                          // Name
+        "is_private": boolean,                        // If account private - True else False
+        "profile_pic_url": string,                    // Url for Profile Pic
+        "profile_pic_id": string,                     // Id for for profile pic
+        "is_verified": boolean,                       // Verified account tag
+        "follow_friction_type": int,                  // Don't know
+        "has_anonymous_profile_picture": boolean,     // Default Profile icon
+        "account_badges": list,                       // Don't know
+        "latest_reel_media": int                      // story id
+    }
+    ...
+]
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_followers(target_username="suyash.jawale", save_to_file=True)
+cli.close()
+```
+####
+_________________________
+
+### 3. get_following()
+#
+```python
+get_following(target_username, save_to_file=False)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_to_device     | Save following list to json file | **True** or **False** | **False**      |
+
+### Response
+```
+#List of dictionaries
+[
+    {
+        "pk": int,                                    // Instagram Id of user
+        "username": string,                           // Instagram Username 
+        "full_name": string,                          // Name
+        "is_private": boolean,                        // If account private - True else False
+        "profile_pic_url": string,                    // Url for Profile Pic
+        "profile_pic_id": string,                     // Id for for profile pic
+        "is_verified": boolean,                       // Verified account tag
+        "follow_friction_type": int,                  // Don't know
+        "has_anonymous_profile_picture": boolean,     // Default Profile icon
+        "account_badges": list,                       // Don't know
+        "latest_reel_media": int                      // story id
+    }
+    ...
+]
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_following(target_username="instagram", save_to_file=True)
+cli.close()
+```
+####
+_________________________
+
+### 4. get_posts()
+#
+```python
+get_posts(target_username,save_urls=False,save_to_device=False,post_count=50)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
+|post_count|Number of post to scrape|**all** or **number**|**50**|
+
+### Response
+```
+{
+    "image": [
+        {
+            "id": string,                // Image id
+            "url": string,               // Url for image
+            "caption": string,           // Image Caption
+            "shortcode": string          // Image identifier code
+        }
+    ],
+    "video": [
+        {
+            "id": string,                // Video Id
+            "thumbnail": string,         // Video thumbnail
+            "caption": string,           // Video Caption
+            "shortcode": string          // Video identifier code
+        }
+    ]
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_posts(target_username="instagram",save_urls=True,save_to_device=False,post_count=10)
+cli.close()
+```
+####
+_________________________
+
+
+### 5. get_reels()
+#
+```
+get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
+|reel_count|Number of reels to scrape|**all** or **number**|**10**|
+
+### Response
+```
+#List of dictionaries
+[
+    {
+        "reel_id": string,            // Id of reel
+        "shortcode": string,          // Reel identifier
+        "reel_thumbnail": string,     // Video thumbnail
+        "caption": string             // Video Caption
+    },
+    ...
+]
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_reels(target_username="instagram",save_urls=True,save_to_device=False,reel_count="all")
+cli.close()
+```
+####
+_________________________
+
+### 6. get_hashtags()
+#
+```
+get_hashtags(hashtag_name,save_urls=False,save_to_device=False,tag_count=50,hashtag_type="recent")
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|hashtag_name       | Name of hashtag to scrape     | --    | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
+|tag_count|Number of reels to scrape|**all** or **number**|**50**|
+|hashtag_type|Scrape "recent" or "top" hashtags.|**recent** or **top**|**recent**|
+### Response
+```
+{
+    "image": [
+        {
+            "url": string,               // image url 
+            "ids": string,               // image id  
+            "alt_text": string,          // text describing photo
+            "shortcode": string,         // image identifier
+            "user_id": int,              // profile id of user who posted
+            "username": string,          // username of person who posted
+            "full_name": string,         // name of user who posted
+            "profile_pic": string,       // profile url of user who posted
+            "caption": string            // image caption
+        }
+        ],
+    "video": [
+        {
+            "thumbnail": string,        // Video thumbnail 
+            "ids": string,              // video id
+            "url": string,              // video url
+            "shortcode": string,        // video shortcode
+            "user_id": int,             // profile id of person who posted
+            "username": string,         // username of person who posted
+            "full_name": string,        // Name of person who posted
+            "profile_pic": string,      // Profile pic url for person
+            "caption": string           // video caption
+        }
+    ]
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_hashtags(hashtag_name="carvideos",save_urls=True,save_to_device=False,tag_count=20,hashtag_type="top")
+cli.close()
+```
+####
+_________________________
+
+### 7. get_igtv_videos()
+#
+```
+get_igtv_videos(target_username,save_urls=False,save_to_device=False,igtv_count=10,mode="easy")
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
+|igtv_count|Number of videos to scrape|**all** or **number**|**10**|
+|mode|There are two types of mode. For mode="easy" , url after 12 videos will be missing. Choose mode="deep" if you want url for all videos(which may freeze your account for multiple requests)|**deep** or **easy**|**easy**|
+
+### Response
+```
+#List of dictionaries
+[
+    {
+        "id": string,                    // igtv video id
+        "shortcode": string,             // video identifier
+        "title": string,                 // video title 
+        "url": string,                   // video url
+        "caption": string                // video caption
+    },
+    ...
+]
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_igtv_videos(target_username="instagram",save_urls=True,save_to_device=False,igtv_count=10,mode="deep")
+cli.close()
+```
+####
+_________________________
+
+### 8. get_comments()
+#
+```
+get_comments(media_link,save_comments=False,comment_count=50)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|media_link     | Link to post/reel/igtv    | --    | --    |
+|save_comments|Save response to json file|**True** or **False**|**False**|
+|comment_count      | Count of comments to scrape | **all** or **number** | **50**      |
+
+
+### Response
+```
+{
+    "owner": {
+        "owner_id": string,                       // Instagram id of person who owns media
+        "owner_name": string,                     // Name of person who owns media
+        "shortcode": string,                      // Post identifier
+        "owner_username": string                  // username of person who owns media
+    },
+    "comments": [
+        {
+            "cid": "string,                       // id of comment
+            "ctype": string,                      // type of comment - parent
+            "user_id": string,                    // Instagram id of person who commented
+            "username": string,                   // Username of person who commented
+            "profile_pic": string,                // Profile Picture of person who commented
+            "comment": string,                    // Comment which the person made
+            "verified": boolean                   // Person who commented is verified
+        },
+        {
+            "cid": string,                        // comment id for above comment - as this is reply for above comment
+            "ctype": string,                      // type of comment - child
+            "tid": string,                        // comment id of this comment
+            "user_id": string,                    // Instagram id for person who commented above comment
+            "username": string,                   // username of person who commented above comment
+            "profile_pic": string,                // profile pic of person who commented above comment
+            "comment": string                     // reply to above comment
+        },
+        ...
+    ]
+}
+```
+#### Where to find link ⤵️
+
+![MarineGEO circle logo](https://i.postimg.cc/MHVj2hGk/Capture12.jpg) 
+
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_comments(media_link="https://www.instagram.com/p/CVCXNoRKvId/?utm_source=ig_web_copy_link",save_comments=True,comment_count=10)
+cli.close()
+```
+####
+_________________________
+
+
+### 9. get_stories()
+#
+```
+get_stories(target_username,save_urls=False,save_to_device=False,story_count=50)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
+|story_count|Number of reels to scrape|**all** or **number**|**50**|
+
+### Response
+```
+{
+    "owner": {
+        "id": string,                   // owner ig id 
+        "username": string              // owner username
+    },
+    "image": [
+        {
+            "sid": string,             // story id
+            "shortcode": string,       // image identifier
+            "url": string              // image url
+        }
+    ],
+    "video": [
+        {
+            "sid": string,             // story id 
+            "shortcode": string,       // video identifier
+            "thumbnail": string,       // video thumbnail
+            "url": string              // video url
+        }
+    ]
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_stories(target_username="unnatiparab",save_urls=True,save_to_device=False,story_count=10)
+cli.close()
+```
+####
+_________________________
+
+
+### 10. get_highlights()
+#
+```
+get_highlights(target_username,save_urls=False,save_to_device=False,story_count=50)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|target_username    | Username of account to scrape     | --    | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
+|story_count|Number of reels to scrape|**all** or **number**|**50**|
+
+### Response
+```
+{
+    "owner": {
+        "id": string,                     // owner ig id
+        "username": string                // owner ig username
+    },
+    "Highlight_name": {                   // Highlight name
+        "image": [
+            {
+                "sid": string,            // image id
+                "shortcode": string,      // image identifier
+                "url": url                // image url
+            }
+        ],
+        "video": [
+            {
+                "sid": string,            // video id
+                "shortcode": string,      // video identifier
+                "thumbnail": string,      // video thumbnail url
+                "url": string             // video url
+            }
+        ]
+    }
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+data= cli.get_highlights(target_username="rashmika_mandanna",save_urls=True,save_to_device=False,story_count=10)
+cli.close()
+```
+####
+_________________________
+
+## License
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/suyashjawale/InstagramCLI/blob/main/LICENSE)
