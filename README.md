@@ -22,8 +22,8 @@ pip install InstagramCLI
 
 
 
-### 1. get_user_info()
-#
+### 1. get_user_info() 
+Get information about a user.
 ```python
 get_user_info(target_username,save_to_device=False)
 ```
@@ -66,7 +66,7 @@ cli.close()
 _________________________
 
 ### 2. get_followers()
-#
+Get followers of particluar account.
 ```python
 get_followers(target_username, save_to_file=False)
 ```
@@ -106,7 +106,7 @@ cli.close()
 _________________________
 
 ### 3. get_following()
-#
+Get following of particular account.
 ```python
 get_following(target_username, save_to_file=False)
 ```
@@ -146,7 +146,7 @@ cli.close()
 _________________________
 
 ### 4. get_posts()
-#
+Fetch post media and post metadata.
 ```python
 get_posts(target_username,save_urls=False,save_to_device=False,post_count=50)
 ```
@@ -190,7 +190,7 @@ _________________________
 
 
 ### 5. get_reels()
-#
+Fetch reel videos and metadata.
 ```
 get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10)
 ```
@@ -225,7 +225,7 @@ cli.close()
 _________________________
 
 ### 6. get_hashtags()
-#
+Search and fetch hashtag media and metadata.
 ```
 get_hashtags(hashtag_name,save_urls=False,save_to_device=False,tag_count=50,hashtag_type="recent")
 ```
@@ -278,7 +278,7 @@ cli.close()
 _________________________
 
 ### 7. get_igtv_videos()
-#
+Get IGTV video media and metadata. 
 ```
 get_igtv_videos(target_username,save_urls=False,save_to_device=False,igtv_count=10,mode="easy")
 ```
@@ -315,7 +315,7 @@ cli.close()
 _________________________
 
 ### 8. get_comments()
-#
+Scrape comments for any media.
 ```
 get_comments(media_link,save_comments=False,comment_count=50)
 ```
@@ -374,7 +374,7 @@ _________________________
 
 
 ### 9. get_stories()
-#
+Download stories and metadata for particular account.
 ```
 get_stories(target_username,save_urls=False,save_to_device=False,story_count=50)
 ```
@@ -421,7 +421,7 @@ _________________________
 
 
 ### 10. get_highlights()
-#
+Scrape account highlights media and metadata
 ```
 get_highlights(target_username,save_urls=False,save_to_device=False,story_count=50)
 ```
