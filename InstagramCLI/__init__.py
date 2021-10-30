@@ -99,7 +99,7 @@ class InstagramCLI():
 
     def exception(self, e):
         try:
-            self.console_logger(f"Error occured.\nReason : {e}")
+            self.console_logger(f"Error occured.\nOpen github issue and upload error snapshot - https://github.com/suyashjawale/InstagramCLI/issues\nReason : {e}")
             self.close()
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -777,7 +777,11 @@ class InstagramCLI():
             if story_count == "all":
                 story_count = 58000000
             self.counter = 1
-            for i in response['reels'][str(user_id)]['items']:
+            reel_response=response['reels']
+            if not reel_response:
+            	self.console_logger("No stories available")
+            	return {}
+            for i in reel_response[str(user_id)]['items']:
                 if self.extract_story(i, save_to_device, f"{target_username}_stories", story_count) == "Limit Reached":
                     break
                 if save_to_device:
