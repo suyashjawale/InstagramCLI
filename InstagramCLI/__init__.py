@@ -67,7 +67,8 @@ class InstagramCLI():
                         self.headers = self.driver.wait_for_request(
                             'reels_tray', timeout=100).headers
                     except:
-                        pass
+                        self.console_logger("Login failed. Please try again.")
+                        exit()
 
                     self.console_logger("Login Success")
                     self.newheaders = {'x-ig-app-id': self.headers['x-ig-app-id'],
@@ -779,8 +780,8 @@ class InstagramCLI():
             self.counter = 1
             reel_response=response['reels']
             if not reel_response:
-            	self.console_logger("No stories available")
-            	return {}
+                self.console_logger("No stories available")
+                return {}
             for i in reel_response[str(user_id)]['items']:
                 if self.extract_story(i, save_to_device, f"{target_username}_stories", story_count) == "Limit Reached":
                     break
