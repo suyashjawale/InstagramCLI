@@ -1,5 +1,5 @@
 # InstagramCLI 
-InstagramCLI is the most advanced scraping library made by reverse-engineering the Instagram API calls which has low latency and prevents you from getting blocked.
+InstagramCLI is the most advanced scraping library made by reverse-engineering the Instagram API calls which has low latency.
 InstagramCLI can be used as a data-gathering tool for data science and osint practices.
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/) 
