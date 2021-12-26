@@ -4,7 +4,7 @@ InstagramCLI can be used as a data-gathering tool for data science and osint pra
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/) 
 #####
-[![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)](https://www.python.org/downloads/release/python-360/)   [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)   [![Python 3.8](https://img.shields.io/badge/python-3.8-red.svg)](https://www.python.org/downloads/release/python-380/) [![Python 3.9](https://img.shields.io/badge/python-3.9-violet.svg)](https://www.python.org/downloads/release/python-390/) [![Python 3.10](https://img.shields.io/badge/python-3.10-green.svg)](https://www.python.org/downloads/release/python-3100/)
+[![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)](https://www.python.org/downloads/release/python-360/)   [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)   [![Python 3.8](https://img.shields.io/badge/python-3.8-red.svg)](https://www.python.org/downloads/release/python-380/) [![Python 3.9](https://img.shields.io/badge/python-3.9-violet.svg)](https://www.python.org/downloads/release/python-390/) 
 
 #### Checkout repo 
 [![forthebadge made-with-python](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/suyashjawale/InstagramCLI) 
@@ -15,9 +15,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Instagr
 pip install InstagramCLI
 ```
 ##### Limitations 
-- **Selenium dependency** - Current version supports chrome browser only    
-- **Platform dependant** - Supports windows only
-- **Next update** will remove browser and platform dependency
+- Works on **Chrome Browser** only on **Windows OS**.
 ## Documentation and Usage
 
 
@@ -148,7 +146,7 @@ _________________________
 ### 4. get_posts()
 Fetch post media and post metadata.
 ```python
-get_posts(target_username,save_urls=False,save_to_device=False,post_count=50)
+get_posts(target_username,save_urls=False,save_to_device=False,post_count=50,media_type="both")
 ```
 | Parameter     | Description       | Values    | Default Value     |
 |---    |---    |---    |---    |
@@ -156,13 +154,16 @@ get_posts(target_username,save_urls=False,save_to_device=False,post_count=50)
 |save_urls|Save response to json file|**True** or **False**|**False**|
 |save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
 |post_count|Number of post to scrape|**all** or **number**|**50**|
+|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
 
 ### Response
 ```
 {
     "image": [
         {
-            "id": string,                // Image id
+            "image_id": string,          // Image id
+            "user_id": string,           // IG id of user
+            "username": string,          // IG username of user
             "url": string,               // Url for image
             "caption": string,           // Image Caption
             "shortcode": string          // Image identifier code
@@ -170,8 +171,11 @@ get_posts(target_username,save_urls=False,save_to_device=False,post_count=50)
     ],
     "video": [
         {
-            "id": string,                // Video Id
+            "video_id": string,          // Video Id
+            "user_id": string,           // IG id of user
+            "username": string,          // IG username of user
             "thumbnail": string,         // Video thumbnail
+            "url": string,               // video download url
             "caption": string,           // Video Caption
             "shortcode": string          // Video identifier code
         }
@@ -182,7 +186,7 @@ get_posts(target_username,save_urls=False,save_to_device=False,post_count=50)
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_posts(target_username="instagram",save_urls=True,save_to_device=False,post_count=10)
+data= cli.get_posts(target_username="instagram",save_urls=True,save_to_device=False,post_count=10,media_type="image")
 cli.close()
 ```
 ####
@@ -191,8 +195,8 @@ _________________________
 
 ### 5. get_reels()
 Fetch reel videos and metadata.
-```
-get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10)
+```python
+get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10,save_music=False)
 ```
 | Parameter     | Description       | Values    | Default Value     |
 |---    |---    |---    |---    |
@@ -200,16 +204,32 @@ get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10)
 |save_urls|Save response to json file|**True** or **False**|**False**|
 |save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
 |reel_count|Number of reels to scrape|**all** or **number**|**10**|
+|save_music|Save music to mp3|**True** or **False**|**False**|
 
 ### Response
 ```
 #List of dictionaries
 [
-    {
-        "reel_id": string,            // Id of reel
-        "shortcode": string,          // Reel identifier
-        "reel_thumbnail": string,     // Video thumbnail
-        "caption": string             // Video Caption
+{
+        "reel_id": string,                   // id of reel
+        "username": string,                  // User of reel owner 
+        "user_id": int,                      // User id of reel owner
+        "shortcode": string,                 // reel identifier
+        "reel_thumbnail": string,            // reel thumbnail
+        "view_count": int,                   // view count of video
+        "play_count": int,                   // play count of video
+        "like_count": int,                   // like count of video
+        "caption": string,                   // reel caption
+        "music": {
+            "music_id": string,              // Music id 
+            "music_name": string,            // Music name
+            "download_url": string,          // Download link for mp3 
+            "artist_id": int,                // Music owner id
+            "artist_username": string,       // Music owner username
+            "artist_name": string,           // Music owner name
+            "is_private": boolean,           // Music owner-is private account 
+            "is_verified": boolean           // Music owner-is verified account
+        }
     },
     ...
 ]
@@ -218,7 +238,7 @@ get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10)
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_reels(target_username="instagram",save_urls=True,save_to_device=False,reel_count="all")
+data= cli.get_reels(target_username="instagram",save_urls=True,save_to_device=False,reel_count="all",save_music=True)
 cli.close()
 ```
 ####
@@ -227,7 +247,7 @@ _________________________
 ### 6. get_hashtags()
 Search and fetch hashtag media and metadata.
 ```
-get_hashtags(hashtag_name,save_urls=False,save_to_device=False,tag_count=50,hashtag_type="recent")
+get_hashtags(hashtag_name,save_urls=False,save_to_device=False,tag_count=50,hashtag_type="recent",media_type="both")
 ```
 | Parameter     | Description       | Values    | Default Value     |
 |---    |---    |---    |---    |
@@ -236,6 +256,7 @@ get_hashtags(hashtag_name,save_urls=False,save_to_device=False,tag_count=50,hash
 |save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
 |tag_count|Number of reels to scrape|**all** or **number**|**50**|
 |hashtag_type|Scrape "recent" or "top" hashtags.|**recent** or **top**|**recent**|
+|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
 ### Response
 ```
 {
@@ -463,6 +484,113 @@ get_highlights(target_username,save_urls=False,save_to_device=False,story_count=
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
 data= cli.get_highlights(target_username="rashmika_mandanna",save_urls=True,save_to_device=False,story_count=10)
+cli.close()
+```
+####
+_________________________
+
+
+### 10. get_similar_reels()
+Find reels with same music.
+```
+get_similar_reels(reel_source,save_urls=False,save_to_device=False,reel_count=10,save_music=False)
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|reel_source    | Enter reel **url** or **shortcode** or **music_id**     |     | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save videos to device | **True** or **False** | **False**      |
+|reel_count|Number of reels to scrape|**all** or **number**|**10**|
+|save_music|Save **.mp3** file to device|**True** or **False**|**False**|
+
+#### Where to find link ⤵️
+
+[![33.jpg](https://i.postimg.cc/3JgHCFN1/33.jpg)](https://postimg.cc/zVXMqWnH)
+### Response
+```
+[
+{
+        "reel_id": string,                   // id of reel
+        "username": string,                  // User of reel owner 
+        "user_id": int,                      // User id of reel owner
+        "shortcode": string,                 // reel identifier
+        "reel_thumbnail": string,            // reel thumbnail
+        "view_count": int,                   // view count of video
+        "play_count": int,                   // play count of video
+        "like_count": int,                   // like count of video
+        "caption": string,                   // reel caption
+        "music": {
+            "music_id": string,              // Music id 
+            "music_name": string,            // Music name
+            "download_url": string,          // Download link for mp3 
+            "artist_id": int,                // Music owner id
+            "artist_username": string,       // Music owner username
+            "artist_name": string,           // Music owner name
+            "is_private": boolean,           // Music owner-is private account 
+            "is_verified": boolean           // Music owner-is verified account
+        }
+    },
+]
+```
+
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="", password="")
+data= cli.get_similar_reels(reel_source="https://www.instagram.com/reel/CX03x8vFPgk/?utm_source=ig_web_copy_link",save_urls=True,save_to_device=False,reel_count=10,save_music=True)
+cli.close()
+```
+####
+_________________________
+
+### 11. get_similar_posts()
+Find similar posts. Some posts may not be similar.
+``` python
+get_similar_posts(media_url,save_urls=False,save_to_device=False,post_count=10,media_type="both")
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|media_url    | Enter post **url**|     | --    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save videos to device | **True** or **False** | **False**      |
+|post_count|Number of posts to scrape|**all** or **number**|**10**|
+|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
+
+#### Where to find link ⤵️
+
+![MarineGEO circle logo](https://i.postimg.cc/MHVj2hGk/Capture12.jpg) 
+
+### Response
+```
+{
+    "image": [
+        {
+            "image_id": string,      // image id
+            "user_id": string,       // IG id of user
+            "username": string,      // IG username of user 
+            "url": string,           //  IG url of video
+            "caption": string,       // image caption
+            "shortcode": string      // Image identifier
+        }
+        ],
+        "video": [
+        {
+            "video_id": string,     // Video id 
+            "user_id": string,      // IG Id of user
+            "username": string,     // IG username if user
+            "thumbnail": string,    // video thumbnail
+            "url": string,          // video url 
+            "caption": string,      // video caption 
+            "shortcode": string     // video shortcode
+        }
+        ]
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="", password="")
+data= cli.get_similar_posts(media_url="https://www.instagram.com/p/CX6wlqBP_L_/?utm_source=ig_web_copy_link",save_urls=True,save_to_device=True,post_count=30,media_type="image")
 cli.close()
 ```
 ####
