@@ -14,7 +14,7 @@ with open("README.md", "r") as fh:
 setup(
     name='InstagramCLI',
     version=push_version,
-    description="InstagramCLI is the most advanced scraping library made by reverse-engineering the Instagram API calls which has low latency and prevents from getting blocked.",
+    description="InstagramCLI is the most advanced scraping library made by reverse-engineering the Instagram API calls which has low latency.",
     author= 'Suyash Jawale',
     url = 'https://github.com/suyashjawale/InstagramCLI',
     author_email='suyashjawale245@gmail.com',
@@ -30,7 +30,6 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
         'Topic :: Software Development :: '
         'Libraries :: Python Modules',
         'Operating System :: Microsoft :: Windows'

@@ -768,32 +768,33 @@ class InstagramCLI():
         except Exception as e:
             self.exception(e)
 
-    def extract_story(self, node, save_to_device, folder_name, story_count,target_username,user_id):
+    def extract_story(self, node, save_to_device, folder_name, story_count,target_username,user_id,media_type):
         try:
             sid = node['id']
             shortcode = node['code']
-            if node['media_type'] == 2:
+            if node['media_type'] == 2 and (media_type=="video" or media_type=="both"):
                 url = node['video_versions'][0]['url']
                 thumbnail = node['image_versions2']['candidates'][0]['url']
+                self.counter+=1
                 if save_to_device:
                     self.download_posts(
                         thumbnail, f"{folder_name}/{target_username}_{sid}_thumbnail", "png")
                     self.download_posts(url, f"{folder_name}/{target_username}_{sid}", "mp4")
                 self.video_list.append(
                     {"sid": sid, "username":target_username,"user_id":user_id, "shortcode": shortcode, "thumbnail": thumbnail, "url": url})
-            elif node['media_type'] == 1:
+            elif node['media_type'] == 1 and (media_type=="image" or media_type=="both"):
                 url = node['image_versions2']['candidates'][0]['url']
+                self.counter+=1
                 if save_to_device:
                     self.download_posts(url, f"{folder_name}/{target_username}_{sid}", "png")
                 self.image_list.append(
                     {"sid": sid, "username":target_username,"user_id":user_id,"shortcode": shortcode, "url": url})
-            if story_count == self.counter:
+            if story_count+1 == self.counter:
                 return "Limit Reached"
-            self.counter += 1
         except Exception as e:
             self.exception(e)
 
-    def get_stories(self, target_username, save_urls=False, save_to_device=False, story_count=50):
+    def get_stories(self, target_username, save_urls=False, save_to_device=False, story_count=50,media_type="both"):
         try:
             user_data = self.get_user_info(
                 target_username, itype="implicit", use="id")
@@ -817,7 +818,7 @@ class InstagramCLI():
                 self.console_logger("No stories available")
                 return {}
             for i in reel_response[str(user_id)]['items']:
-                if self.extract_story(i, save_to_device, f"{target_username}_stories", story_count,target_username,user_id) == "Limit Reached":
+                if self.extract_story(i, save_to_device, f"{target_username}_stories", story_count,target_username,user_id,media_type) == "Limit Reached":
                     break
                 if save_to_device:
                     self.console_logger(
@@ -833,7 +834,7 @@ class InstagramCLI():
         except Exception as e:
             self.exception(e)
 
-    def get_highlights(self, target_username, save_urls=False, save_to_device=False, story_count=50):
+    def get_highlights(self, target_username, save_urls=False, save_to_device=False, story_count=50,media_type="both"):
         try:
             user_data = self.get_user_info(
                 target_username, itype="implicit", use="id")
@@ -873,7 +874,7 @@ class InstagramCLI():
                         else:
                             self.console_logger(
                                 f"Iteration : {self.counter}", end="\r")
-                        if self.extract_story(k, save_to_device, f"{target_username}_highlights", story_count,target_username,user_id) == "Limit Reached":
+                        if self.extract_story(k, save_to_device, f"{target_username}_highlights", story_count,target_username,user_id,media_type) == "Limit Reached":
                             data[title] = {
                                 "image": self.image_list, "video": self.video_list}
                             if save_urls:
@@ -1052,7 +1053,7 @@ class InstagramCLI():
         except Exception as e:
             self.exception(e)
 
-    def get_latest_feed_story(self,save_urls=False,save_to_device=False,story_count=10,media_type="both"):
+    def get_story_timeline(self,save_urls=False,save_to_device=False,story_count=10,media_type="both"):
         try:
             url = "https://i.instagram.com/api/v1/feed/reels_tray/"
             response = requests.request("GET", url, headers=self.newheaders, data={})
@@ -1076,7 +1077,7 @@ class InstagramCLI():
                         self.console_logger(f"Iteration : {iteration}", end="\r")
                     if "items" in i:
                         for j in i['items']:
-                            if self.extract_story(j,save_to_device,variable,story_count,i['user']['username'],i['user']['pk'])=="Limit Reached":
+                            if self.extract_story(j,save_to_device,variable,story_count,i['user']['username'],i['user']['pk'],media_type)=="Limit Reached":
                                 break
                     iteration+=1
 
