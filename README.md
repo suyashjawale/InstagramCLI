@@ -397,7 +397,7 @@ _________________________
 ### 9. get_stories()
 Download stories and metadata for particular account.
 ```
-get_stories(target_username,save_urls=False,save_to_device=False,story_count=50)
+get_stories(target_username,save_urls=False,save_to_device=False,story_count=50,media_type="both")
 ```
 | Parameter     | Description       | Values    | Default Value     |
 |---    |---    |---    |---    |
@@ -405,27 +405,28 @@ get_stories(target_username,save_urls=False,save_to_device=False,story_count=50)
 |save_urls|Save response to json file|**True** or **False**|**False**|
 |save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
 |story_count|Number of reels to scrape|**all** or **number**|**50**|
+|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
 
 ### Response
 ```
 {
-    "owner": {
-        "id": string,                   // owner ig id 
-        "username": string              // owner username
-    },
     "image": [
-        {
-            "sid": string,             // story id
-            "shortcode": string,       // image identifier
-            "url": string              // image url
+            {
+            "sid": string,            // Story id
+            "username": string,       // Username of owner
+            "user_id": int,           // Owner IG id
+            "shortcode": string,      // Story identifier
+            "url": string             // Story download url
         }
-    ],
+        ],
     "video": [
         {
-            "sid": string,             // story id 
-            "shortcode": string,       // video identifier
-            "thumbnail": string,       // video thumbnail
-            "url": string              // video url
+            "sid": string,           // Video id
+            "username": string,      // IG owner username
+            "user_id": string,       // IG owner id
+            "shortcode": string,     // Video identifier
+            "thumbnail": string,     // Video thumbnail
+            "url": string            // Video url
         }
     ]
 }
@@ -444,7 +445,7 @@ _________________________
 ### 10. get_highlights()
 Scrape account highlights media and metadata
 ```
-get_highlights(target_username,save_urls=False,save_to_device=False,story_count=50)
+get_highlights(target_username,save_urls=False,save_to_device=False,story_count=50,media_type="both")
 ```
 | Parameter     | Description       | Values    | Default Value     |
 |---    |---    |---    |---    |
@@ -452,31 +453,32 @@ get_highlights(target_username,save_urls=False,save_to_device=False,story_count=
 |save_urls|Save response to json file|**True** or **False**|**False**|
 |save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
 |story_count|Number of reels to scrape|**all** or **number**|**50**|
+|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
 
 ### Response
 ```
 {
-    "owner": {
-        "id": string,                     // owner ig id
-        "username": string                // owner ig username
-    },
-    "Highlight_name": {                   // Highlight name
-        "image": [
+    "Highlight_name":{
+    "image": [
             {
-                "sid": string,            // image id
-                "shortcode": string,      // image identifier
-                "url": url                // image url
-            }
+            "sid": string,            // Story id
+            "username": string,       // Username of owner
+            "user_id": int,           // Owner IG id
+            "shortcode": string,      // Story identifier
+            "url": string             // Story download url
+        }
         ],
-        "video": [
-            {
-                "sid": string,            // video id
-                "shortcode": string,      // video identifier
-                "thumbnail": string,      // video thumbnail url
-                "url": string             // video url
-            }
-        ]
-    }
+    "video": [
+        {
+            "sid": string,           // Video id
+            "username": string,      // IG owner username
+            "user_id": string,       // IG owner id
+            "shortcode": string,     // Video identifier
+            "thumbnail": string,     // Video thumbnail
+            "url": string            // Video url
+        }
+    ]
+}
 }
 ```
 #### Example 
@@ -591,6 +593,53 @@ get_similar_posts(media_url,save_urls=False,save_to_device=False,post_count=10,m
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="", password="")
 data= cli.get_similar_posts(media_url="https://www.instagram.com/p/CX6wlqBP_L_/?utm_source=ig_web_copy_link",save_urls=True,save_to_device=True,post_count=30,media_type="image")
+cli.close()
+```
+####
+_________________________
+
+
+### 12. get_story_timeline()
+Scrapes stories from the timeline. Scrapes only latest stories. Some stories may not be available.
+``` python
+get_story_timeline(save_urls=False,save_to_device=False,story_count=10,media_type="both")
+```
+| Parameter     | Description       | Values    | Default Value     |
+|---    |---    |---    |---    |
+|save_urls|Save response to json file|**True** or **False**|**False**|
+|save_to_device     | Save media to device | **True** or **False** | **False**      |
+|story_count|Number of posts to scrape|**all** or **number**|**10**|
+|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
+
+### Response
+```
+{
+    "image": [
+            {
+            "sid": string,            // Story id
+            "username": string,       // Username of owner
+            "user_id": int,           // Owner IG id
+            "shortcode": string,      // Story identifier
+            "url": string             // Story download url
+        }
+        ],
+    "video": [
+        {
+            "sid": string,           // Video id
+            "username": string,      // IG owner username
+            "user_id": string,       // IG owner id
+            "shortcode": string,     // Video identifier
+            "thumbnail": string,     // Video thumbnail
+            "url": string            // Video url
+        }
+    ]
+}
+```
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="", password="")
+data= cli.get_story_timeline(save_urls=False,save_to_device=False,story_count=10,media_type="both")
 cli.close()
 ```
 ####
