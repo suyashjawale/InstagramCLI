@@ -14,6 +14,13 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Instagr
 ```bash
 pip install InstagramCLI
 ```
+##### Troubleshoot
+###### Sometimes you might face installation error.
+###### Visit the link - [Visual C++ Redistributable link](https://docs.microsoft.com/en-GB/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022)  and download & install the vc_redist.x86.exe and vc_redist.x64.exe
+###### Checkout issue @ [https://stackoverflow.com/a/63716314/9807249](https://stackoverflow.com/a/63716314/9807249) 
+
+
+#
 ##### Limitations 
 - Works on **Chrome Browser** only on **Windows OS**.
 ## Documentation and Usage
