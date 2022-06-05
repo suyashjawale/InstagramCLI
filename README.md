@@ -1,3 +1,5 @@
+# This library no longer works since all the api calls which were made to Instagram are now changed. Stay tuned for update !!
+
 # InstagramCLI 
 InstagramCLI is the most advanced data mining library made by reverse-engineering the Instagram API calls which has low latency.
 InstagramCLI can be used as a data-gathering tool for data science and osint practices.
