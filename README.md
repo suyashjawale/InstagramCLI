@@ -1,13 +1,9 @@
-# This library no longer works since all the api calls which were made to Instagram are now changed. Stay tuned for update !!
-
 # InstagramCLI 
-InstagramCLI is the most advanced data mining library made by reverse-engineering the Instagram API calls which has low latency.
-InstagramCLI can be used as a data-gathering tool for data science and osint practices.
+CLI tool made by reverse engineering Instagram API calls.
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/) 
 #####
-[![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)](https://www.python.org/downloads/release/python-360/)   [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)   [![Python 3.8](https://img.shields.io/badge/python-3.8-red.svg)](https://www.python.org/downloads/release/python-380/) [![Python 3.9](https://img.shields.io/badge/python-3.9-violet.svg)](https://www.python.org/downloads/release/python-390/) 
-
+[![Python 3.6](https://img.shields.io/badge/python-3.6-green.svg)](https://www.python.org/downloads/release/python-360/)   [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)   [![Python 3.8](https://img.shields.io/badge/python-3.8-red.svg)](https://www.python.org/downloads/release/python-380/) [![Python 3.9](https://img.shields.io/badge/python-3.9-violet.svg)](https://www.python.org/downloads/release/python-390/) [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-390/)
 #### Checkout repo 
 [![forthebadge made-with-python](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/suyashjawale/InstagramCLI) 
 
@@ -16,640 +12,342 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Instagr
 ```bash
 pip install InstagramCLI
 ```
-##### Troubleshoot
-###### Sometimes you might face installation error.
-###### Visit the link - [Visual C++ Redistributable link](https://docs.microsoft.com/en-GB/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022)  and download & install the vc_redist.x86.exe and vc_redist.x64.exe
-###### Checkout issue @ [https://stackoverflow.com/a/63716314/9807249](https://stackoverflow.com/a/63716314/9807249) 
 
-
-#
-##### Limitations 
-- Works on **Chrome Browser** only on **Windows OS**.
 ## Documentation and Usage
-
-
-
-### 1. get_user_info() 
-Get information about a user.
-```python
-get_user_info(target_username,save_to_device=False)
-```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_to_device     | Save response to json file | **True** or **False** | **False**      |
-
-### Response
-```
-{
-    "user_id": string,                     // Instagram id of user
-    "username": string,                    // Instagram username of user
-    "full_name": string,                   // Instagram name of user
-    "following_count": int,                // Following count of user
-    "follower_count": int,                 // Follower count of user
-    "private": boolean,                    // Account is private= True else False
-    "verified": boolean,                   // Account is verified=True else False
-    "bio": string,                         // Bio text
-    "category_name": string,               // Person category name
-    "profile_pic_url": string,             // Tiny url link
-    "bio_url": string,                     // Website link  
-    "follows_you": boolean,                // If the user follows you
-    "fb_id": string,                       // Facebook profile id
-    "you_follow": boolean,                 // If you follow the user
-    "highlights_count": int,               // Number of highlights present on profile
-    "professional_account": boolean,       // If the account is professional account
-    "posts_count": int,                    // Number of posts on account
-    "igtv_count": int                      // Number of igtv videos on account
-}
-```
-#### Example 
-```python
-from InstagramCLI import InstagramCLI
-cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_user_info(target_username="instagram",save_to_device=True)
-cli.close()
-```
-####
-_________________________
-
-### 2. get_followers()
+### 1. get_followers()
 Get followers of particluar account.
 ```python
-get_followers(target_username, save_to_file=False)
+get_followers(username, save, optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_to_device     | Save followers list to json file | **True** or **False** | **False**      |
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|username |  string | Username of account to scrape     | --    | --    |
+|save   | boolean | Save followers list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-### Response
-```
-#List of dictionaries
-[
-    {
-        "pk": int,                                    // Instagram Id of user
-        "username": string,                           // Instagram Username 
-        "full_name": string,                          // Name
-        "is_private": boolean,                        // If account private - True else False
-        "profile_pic_url": string,                    // Url for Profile Pic
-        "profile_pic_id": string,                     // Id for for profile pic
-        "is_verified": boolean,                       // Verified account tag
-        "follow_friction_type": int,                  // Don't know
-        "has_anonymous_profile_picture": boolean,     // Default Profile icon
-        "account_badges": list,                       // Don't know
-        "latest_reel_media": int                      // story id
-    }
-    ...
-]
-```
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|count|**int** or **string**|Number of followers|**number** or **all**|**all**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**followers**|
+|filename|**string**|Custom file name|Anything you want|**username_followers**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
+optimizations = {
+    "count" : 24, // Must be a multiple of 12,
+    "folder" : "custom_readme_demo", 
+    "sub_folder" : "custom_sub_folder",
+    "filename" : "anything_i_want",
+    "timestamp_folder" : True,
+    "timestamp_file" : True
+}
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_followers(target_username="suyash.jawale", save_to_file=True)
-cli.close()
+data= cli.get_followers(username="suyash.jawale", optimizations=optimizations)
 ```
 ####
 _________________________
 
-### 3. get_following()
-Get following of particular account.
+### 2. get_following()
+Get following of particluar account.
 ```python
-get_following(target_username, save_to_file=False)
+get_following(username, save, optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_to_device     | Save following list to json file | **True** or **False** | **False**      |
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|username |  string | Username of account to scrape     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-### Response
-```
-#List of dictionaries
-[
-    {
-        "pk": int,                                    // Instagram Id of user
-        "username": string,                           // Instagram Username 
-        "full_name": string,                          // Name
-        "is_private": boolean,                        // If account private - True else False
-        "profile_pic_url": string,                    // Url for Profile Pic
-        "profile_pic_id": string,                     // Id for for profile pic
-        "is_verified": boolean,                       // Verified account tag
-        "follow_friction_type": int,                  // Don't know
-        "has_anonymous_profile_picture": boolean,     // Default Profile icon
-        "account_badges": list,                       // Don't know
-        "latest_reel_media": int                      // story id
-    }
-    ...
-]
-```
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|count|**int** or **string**|Number of following|**number** or **all**|**all**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**following**|
+|filename|**string**|Custom file name|Anything you want|**username_following**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
+optimizations = {
+    "count" : 24, // Must be a multiple of 12,
+    "folder" : "custom_readme_demo", 
+    "sub_folder" : "custom_sub_folder",
+    "filename" : "anything_i_want",
+    "timestamp_folder" : True,
+    "timestamp_file" : True
+}
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_following(target_username="instagram", save_to_file=True)
-cli.close()
+data= cli.get_following(username="suyash.jawale", optimizations=optimizations)
 ```
 ####
 _________________________
 
-### 4. get_posts()
+### 3. get_posts()
 Fetch post media and post metadata.
 ```python
-get_posts(target_username,save_urls=False,save_to_device=False,post_count=50,media_type="both")
+get_posts(username,save,optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
-|post_count|Number of post to scrape|**all** or **number**|**50**|
-|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|username |  string | Username of account to scrape     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-### Response
-```
-{
-    "image": [
-        {
-            "image_id": string,          // Image id
-            "user_id": string,           // IG id of user
-            "username": string,          // IG username of user
-            "url": string,               // Url for image
-            "caption": string,           // Image Caption
-            "shortcode": string          // Image identifier code
-        }
-    ],
-    "video": [
-        {
-            "video_id": string,          // Video Id
-            "user_id": string,           // IG id of user
-            "username": string,          // IG username of user
-            "thumbnail": string,         // Video thumbnail
-            "url": string,               // video download url
-            "caption": string,           // Video Caption
-            "shortcode": string          // Video identifier code
-        }
-    ]
-}
-```
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|count|**int**|Count of posts|**number** or **all**|**24**|
+|media_type|**string**|What to scrape photo or video|**photo** or **video** or **both**|**both**|
+|save_photo|**boolean**|Save photo post|**True** or **False**|**False**|
+|save_video|**boolean**|Save video post|**True** or **False**|**False**|
+|save_video_thumbnail|**boolean**|Save thumbnail of video|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**posts**|
+|filename|**string**|Custom file name|Anything you want|**username_posts**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_posts(target_username="instagram",save_urls=True,save_to_device=False,post_count=10,media_type="image")
-cli.close()
+optimizations = {
+    "count" : 36, // Multiple of 12
+    "save_photo" : True,
+    "save_video" : True,
+    "timestamp_folder" : True
+}
+data= cli.get_posts(username="instagram",optimizations=optimizations)
 ```
 ####
 _________________________
 
 
-### 5. get_reels()
+### 4. get_reels()
 Fetch reel videos and metadata.
 ```python
-get_reels(target_username,save_urls=False,save_to_device=False,reel_count=10,save_music=False)
+get_reels(username,save,optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
-|reel_count|Number of reels to scrape|**all** or **number**|**10**|
-|save_music|Save music to mp3|**True** or **False**|**False**|
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|username |  string | Username of account to scrape     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-### Response
-```
-#List of dictionaries
-[
-{
-        "reel_id": string,                   // id of reel
-        "username": string,                  // User of reel owner 
-        "user_id": int,                      // User id of reel owner
-        "shortcode": string,                 // reel identifier
-        "reel_thumbnail": string,            // reel thumbnail
-        "view_count": int,                   // view count of video
-        "play_count": int,                   // play count of video
-        "like_count": int,                   // like count of video
-        "caption": string,                   // reel caption
-        "music": {
-            "music_id": string,              // Music id 
-            "music_name": string,            // Music name
-            "download_url": string,          // Download link for mp3 
-            "artist_id": int,                // Music owner id
-            "artist_username": string,       // Music owner username
-            "artist_name": string,           // Music owner name
-            "is_private": boolean,           // Music owner-is private account 
-            "is_verified": boolean           // Music owner-is verified account
-        }
-    },
-    ...
-]
-```
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|count|**int**|Count of reels|**number** or **all**|**18**|
+|save_video|**boolean**|Save video post|**True** or **False**|**False**|
+|save_video_thumbnail|**boolean**|Save thumbnail of video|**True** or **False**|**False**|
+|save_music|**boolean**|Save reel music|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**reels**|
+|filename|**string**|Custom file name|Anything you want|**username_reels**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_reels(target_username="instagram",save_urls=True,save_to_device=False,reel_count="all",save_music=True)
-cli.close()
+optimized = {
+            "count": optimizations.get("count", 18),
+            "save_video": optimizations.get("save_video", False),
+            "save_video_thumbnail": optimizations.get("save_video_thumbnail", False),
+            "save_music": optimizations.get("save_music", False),
+            "timestamp_folder" : optimizations.get("timestamp_folder",False),
+            "timestamp_file" : optimizations.get("timestamp_file",False)
+    }
+data= cli.get_reels(username="instagram",optimizations=optimized)
 ```
 ####
 _________________________
 
-### 6. get_hashtags()
-Search and fetch hashtag media and metadata.
-```
-get_hashtags(hashtag_name,save_urls=False,save_to_device=False,tag_count=50,hashtag_type="recent",media_type="both")
-```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|hashtag_name       | Name of hashtag to scrape     | --    | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
-|tag_count|Number of reels to scrape|**all** or **number**|**50**|
-|hashtag_type|Scrape "recent" or "top" hashtags.|**recent** or **top**|**recent**|
-|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
-### Response
-```
-{
-    "image": [
-        {
-            "url": string,               // image url 
-            "ids": string,               // image id  
-            "alt_text": string,          // text describing photo
-            "shortcode": string,         // image identifier
-            "user_id": int,              // profile id of user who posted
-            "username": string,          // username of person who posted
-            "full_name": string,         // name of user who posted
-            "profile_pic": string,       // profile url of user who posted
-            "caption": string            // image caption
-        }
-        ],
-    "video": [
-        {
-            "thumbnail": string,        // Video thumbnail 
-            "ids": string,              // video id
-            "url": string,              // video url
-            "shortcode": string,        // video shortcode
-            "user_id": int,             // profile id of person who posted
-            "username": string,         // username of person who posted
-            "full_name": string,        // Name of person who posted
-            "profile_pic": string,      // Profile pic url for person
-            "caption": string           // video caption
-        }
-    ]
-}
-```
-#### Example 
-```python
-from InstagramCLI import InstagramCLI
-cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_hashtags(hashtag_name="carvideos",save_urls=True,save_to_device=False,tag_count=20,hashtag_type="top")
-cli.close()
-```
-####
-_________________________
-
-### 7. get_igtv_videos()
-Get IGTV video media and metadata. 
-```
-get_igtv_videos(target_username,save_urls=False,save_to_device=False,igtv_count=10,mode="easy")
-```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
-|igtv_count|Number of videos to scrape|**all** or **number**|**10**|
-|mode|There are two types of mode. For mode="easy" , url after 12 videos will be missing. Choose mode="deep" if you want url for all videos(which may freeze your account for multiple requests)|**deep** or **easy**|**easy**|
-
-### Response
-```
-#List of dictionaries
-[
-    {
-        "id": string,                    // igtv video id
-        "shortcode": string,             // video identifier
-        "title": string,                 // video title 
-        "url": string,                   // video url
-        "caption": string                // video caption
-    },
-    ...
-]
-```
-#### Example 
-```python
-from InstagramCLI import InstagramCLI
-cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_igtv_videos(target_username="instagram",save_urls=True,save_to_device=False,igtv_count=10,mode="deep")
-cli.close()
-```
-####
-_________________________
-
-### 8. get_comments()
+### 5. get_comments()
 Scrape comments for any media.
 ```
-get_comments(media_link,save_comments=False,comment_count=50)
+get_comments(shortcode,save,optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|media_link     | Link to post/reel/igtv    | --    | --    |
-|save_comments|Save response to json file|**True** or **False**|**False**|
-|comment_count      | Count of comments to scrape | **all** or **number** | **50**      |
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|shortcode |  string | Post id     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
+
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|count|**int**|Count of posts|**number** or **all**|**60**|
+|child_comments|**string**|Comments of a comment|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**shortcode**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**comments**|
+|filename|**string**|Custom file name|Anything you want|**shortcode_comments**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to file|**True** or **False**|**False**|
 
 
-### Response
-```
-{
-    "owner": {
-        "owner_id": string,                       // Instagram id of person who owns media
-        "owner_name": string,                     // Name of person who owns media
-        "shortcode": string,                      // Post identifier
-        "owner_username": string                  // username of person who owns media
-    },
-    "comments": [
-        {
-            "cid": "string,                       // id of comment
-            "ctype": string,                      // type of comment - parent
-            "user_id": string,                    // Instagram id of person who commented
-            "username": string,                   // Username of person who commented
-            "profile_pic": string,                // Profile Picture of person who commented
-            "comment": string,                    // Comment which the person made
-            "verified": boolean                   // Person who commented is verified
-        },
-        {
-            "cid": string,                        // comment id for above comment - as this is reply for above comment
-            "ctype": string,                      // type of comment - child
-            "tid": string,                        // comment id of this comment
-            "user_id": string,                    // Instagram id for person who commented above comment
-            "username": string,                   // username of person who commented above comment
-            "profile_pic": string,                // profile pic of person who commented above comment
-            "comment": string                     // reply to above comment
-        },
-        ...
-    ]
-}
-```
-#### Where to find link ⤵️
-
-![MarineGEO circle logo](https://i.postimg.cc/MHVj2hGk/Capture12.jpg) 
+#### Where to find shortcode ⤵️
+[![Screenshot-22.jpg](https://i.postimg.cc/jjKmXC2v/Screenshot-22.jpg)](https://postimg.cc/cv9F1xQ8)
 
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_comments(media_link="https://www.instagram.com/p/CVCXNoRKvId/?utm_source=ig_web_copy_link",save_comments=True,comment_count=10)
-cli.close()
+optimizations = {
+    "count" : 25,
+    "child_comments" : True, // This operations requires requesting to server. 
+    "timestamp_folder" : True
+}
+data= cli.get_comments(shortcode="CkP5nARPxSg",optimizations=optimizations)
 ```
 ####
 _________________________
 
 
-### 9. get_stories()
+### 6. get_story()
 Download stories and metadata for particular account.
 ```
-get_stories(target_username,save_urls=False,save_to_device=False,story_count=50,media_type="both")
+get_story(username,save,optimizations )
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
-|story_count|Number of reels to scrape|**all** or **number**|**50**|
-|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|username |  string | Username of account to scrape     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-### Response
-```
-{
-    "image": [
-            {
-            "sid": string,            // Story id
-            "username": string,       // Username of owner
-            "user_id": int,           // Owner IG id
-            "shortcode": string,      // Story identifier
-            "url": string             // Story download url
-        }
-        ],
-    "video": [
-        {
-            "sid": string,           // Video id
-            "username": string,      // IG owner username
-            "user_id": string,       // IG owner id
-            "shortcode": string,     // Video identifier
-            "thumbnail": string,     // Video thumbnail
-            "url": string            // Video url
-        }
-    ]
-}
-```
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|media_type|**string**|What to scrape photo or video|**photo** or **video** or **both**|**both**|
+|save_photo|**boolean**|Save photo post|**True** or **False**|**False**|
+|save_video|**boolean**|Save video post|**True** or **False**|**False**|
+|save_video_thumbnail|**boolean**|Save thumbnail of video|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**story**|
+|filename|**string**|Custom file name|Anything you want|**username_story**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_stories(target_username="unnatiparab",save_urls=True,save_to_device=False,story_count=10)
-cli.close()
+optimizations = {
+    "raw_response":True,
+    "media_type" : "video",
+    "save_photo" : True,
+    "save_video": True
+}
+data= cli.get_story(username="sakshimalikk",optimizations=optimizations)
 ```
 ####
 _________________________
 
 
-### 10. get_highlights()
+### 7. get_highlights()
 Scrape account highlights media and metadata
 ```
-get_highlights(target_username,save_urls=False,save_to_device=False,story_count=50,media_type="both")
+get_highlights(username,save,optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|target_username    | Username of account to scrape     | --    | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save images and videos to device | **True** or **False** | **False**      |
-|story_count|Number of reels to scrape|**all** or **number**|**50**|
-|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|username |  string | Username of account to scrape     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-### Response
-```
-{
-    "Highlight_name":{
-    "image": [
-            {
-            "sid": string,            // Story id
-            "username": string,       // Username of owner
-            "user_id": int,           // Owner IG id
-            "shortcode": string,      // Story identifier
-            "url": string             // Story download url
-        }
-        ],
-    "video": [
-        {
-            "sid": string,           // Video id
-            "username": string,      // IG owner username
-            "user_id": string,       // IG owner id
-            "shortcode": string,     // Video identifier
-            "thumbnail": string,     // Video thumbnail
-            "url": string            // Video url
-        }
-    ]
-}
-}
-```
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|media_type|**string**|What to scrape photo or video|**photo** or **video** or **both**|**both**|
+|highlight_count|**string** or **number**|Count of highlights|**all** or **number**|**4**|
+|story_count|**string** or **number**|Count of story|**all** or **number**|**10**|
+|save_photo|**boolean**|Save photo post|**True** or **False**|**False**|
+|save_video|**boolean**|Save video post|**True** or **False**|**False**|
+|save_video_thumbnail|**boolean**|Save thumbnail of video|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**highlights**|
+|filename|**string**|Custom file name|Anything you want|**username_highlights**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="your_username", password="your_password")
-data= cli.get_highlights(target_username="rashmika_mandanna",save_urls=True,save_to_device=False,story_count=10)
-cli.close()
+optimizations = {
+    "save_photo" : True,
+    "save_video" : True,
+    "highlight_count" : 5,
+    "story_count" : 20,
+}
+data= cli.get_highlights(username="rashmika_mandanna",optimizations=optimizations)
+
 ```
 ####
 _________________________
 
 
-### 10. get_similar_reels()
+### 8. get_music_reels()
 Find reels with same music.
 ```
-get_similar_reels(reel_source,save_urls=False,save_to_device=False,reel_count=10,save_music=False)
+get_music_reels(music_id,save,optimizations)
 ```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|reel_source    | Enter reel **url** or **shortcode** or **music_id**     |     | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save videos to device | **True** or **False** | **False**      |
-|reel_count|Number of reels to scrape|**all** or **number**|**10**|
-|save_music|Save **.mp3** file to device|**True** or **False**|**False**|
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|music_id |  string | Id of music     | --    | --    |
+|save   | boolean | Save following list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
 
-#### Where to find link ⤵️
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|count|**int**|Count of reels|**number** or **all**|**18**|
+|save_video|**boolean**|Save video post|**True** or **False**|**False**|
+|save_video_thumbnail|**boolean**|Save thumbnail of video|**True** or **False**|**False**|
+|save_music|**boolean**|Save reel music|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**username**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**reels**|
+|filename|**string**|Custom file name|Anything you want|**username_reels**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
 
-[![33.jpg](https://i.postimg.cc/3JgHCFN1/33.jpg)](https://postimg.cc/zVXMqWnH)
-### Response
-```
-[
-{
-        "reel_id": string,                   // id of reel
-        "username": string,                  // User of reel owner 
-        "user_id": int,                      // User id of reel owner
-        "shortcode": string,                 // reel identifier
-        "reel_thumbnail": string,            // reel thumbnail
-        "view_count": int,                   // view count of video
-        "play_count": int,                   // play count of video
-        "like_count": int,                   // like count of video
-        "caption": string,                   // reel caption
-        "music": {
-            "music_id": string,              // Music id 
-            "music_name": string,            // Music name
-            "download_url": string,          // Download link for mp3 
-            "artist_id": int,                // Music owner id
-            "artist_username": string,       // Music owner username
-            "artist_name": string,           // Music owner name
-            "is_private": boolean,           // Music owner-is private account 
-            "is_verified": boolean           // Music owner-is verified account
-        }
-    },
-]
-```
-
+#### Where to find music_id ⤵️
+Step 1 - Clik on mysic name of reel
+[![step1.jpg](https://i.postimg.cc/Hxf25VVW/step1.jpg)](https://postimg.cc/PpQYnfW0)
+Step 2 - Copy the music id
+[![step2.jpg](https://i.postimg.cc/dQ8j7Qm6/step2.jpg)](https://postimg.cc/kDgbzmHR)
 #### Example 
 ```python
 from InstagramCLI import InstagramCLI
 cli = InstagramCLI(username="", password="")
-data= cli.get_similar_reels(reel_source="https://www.instagram.com/reel/CX03x8vFPgk/?utm_source=ig_web_copy_link",save_urls=True,save_to_device=False,reel_count=10,save_music=True)
-cli.close()
-```
-####
-_________________________
-
-### 11. get_similar_posts()
-Find similar posts. Some posts may not be similar.
-``` python
-get_similar_posts(media_url,save_urls=False,save_to_device=False,post_count=10,media_type="both")
-```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|media_url    | Enter post **url**|     | --    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save videos to device | **True** or **False** | **False**      |
-|post_count|Number of posts to scrape|**all** or **number**|**10**|
-|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
-
-#### Where to find link ⤵️
-
-![MarineGEO circle logo](https://i.postimg.cc/MHVj2hGk/Capture12.jpg) 
-
-### Response
-```
-{
-    "image": [
-        {
-            "image_id": string,      // image id
-            "user_id": string,       // IG id of user
-            "username": string,      // IG username of user 
-            "url": string,           //  IG url of video
-            "caption": string,       // image caption
-            "shortcode": string      // Image identifier
-        }
-        ],
-        "video": [
-        {
-            "video_id": string,     // Video id 
-            "user_id": string,      // IG Id of user
-            "username": string,     // IG username if user
-            "thumbnail": string,    // video thumbnail
-            "url": string,          // video url 
-            "caption": string,      // video caption 
-            "shortcode": string     // video shortcode
-        }
-        ]
+optimizations = {
+    "count" : 40,
+    "save_video" : True
 }
-```
-#### Example 
-```python
-from InstagramCLI import InstagramCLI
-cli = InstagramCLI(username="", password="")
-data= cli.get_similar_posts(media_url="https://www.instagram.com/p/CX6wlqBP_L_/?utm_source=ig_web_copy_link",save_urls=True,save_to_device=True,post_count=30,media_type="image")
-cli.close()
-```
-####
-_________________________
-
-
-### 12. get_story_timeline()
-Scrapes stories from the timeline. Scrapes only latest stories. Some stories may not be available.
-``` python
-get_story_timeline(save_urls=False,save_to_device=False,story_count=10,media_type="both")
-```
-| Parameter     | Description       | Values    | Default Value     |
-|---    |---    |---    |---    |
-|save_urls|Save response to json file|**True** or **False**|**False**|
-|save_to_device     | Save media to device | **True** or **False** | **False**      |
-|story_count|Number of posts to scrape|**all** or **number**|**10**|
-|media_type|Scrape only image or video or both |**image** or **video** or **both**|**both**|
-
-### Response
-```
-{
-    "image": [
-            {
-            "sid": string,            // Story id
-            "username": string,       // Username of owner
-            "user_id": int,           // Owner IG id
-            "shortcode": string,      // Story identifier
-            "url": string             // Story download url
-        }
-        ],
-    "video": [
-        {
-            "sid": string,           // Video id
-            "username": string,      // IG owner username
-            "user_id": string,       // IG owner id
-            "shortcode": string,     // Video identifier
-            "thumbnail": string,     // Video thumbnail
-            "url": string            // Video url
-        }
-    ]
-}
-```
-#### Example 
-```python
-from InstagramCLI import InstagramCLI
-cli = InstagramCLI(username="", password="")
-data= cli.get_story_timeline(save_urls=False,save_to_device=False,story_count=10,media_type="both")
-cli.close()
+data= cli.get_similar_reels(music_id="1184871695410444",optimizations=optimizations)
 ```
 ####
 _________________________
