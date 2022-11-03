@@ -1,6 +1,6 @@
 import requests
+from datetime import datetime
 import json
-import re
 from bs4 import BeautifulSoup
 import os
 import logging
@@ -16,34 +16,32 @@ logging.basicConfig(
     ]
 )
 
-
 class InstagramCLI():
     def __init__(self, username=None, password=None):
         try:
             logging.info("-----------------------------------")
             self.session = requests.Session()
-            self.session.proxies = {}
-            self.session.headers = {'Referer': 'https://www.instagram.com/',
-                                    'user-agent': 'Instagram 123.0.0.21.114 (iPhone; CPU iPhone OS 11_4 like Mac OS X; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/605.1.15'}
+    
             self.session.cookies.update({
-                'sessionid': '',
-                'mid': '',
-                'ig_pr': '1',
-                'ig_vw': '1920',
-                'csrftoken': '',
-                's_network': '',
-                'ds_user_id': ''
+                "csrftoken":"",
+                "ds_user_id":"",
+                "ig_did":"",
+                "ig_nrcb":"",
+                "rur":"",
+                "sessionid":""
             })
+
             base_request = self.session.get('https://www.instagram.com/')
-            self.session.headers.update(
-                {'X-CSRFToken': base_request.cookies['csrftoken']})
+            
+            self.session.headers = {'Referer': 'https://www.instagram.com/','user-agent': 'Instagram 123.0.0.21.114 (iPhone; CPU iPhone OS 11_4 like Mac OS X; en_US; en-US; scale=2.00; 750x1334) AppleWebKit/605.1.15'}
+
+            self.session.headers.update({'X-CSRFToken': base_request.cookies['csrftoken']})
+
             self.credentials = {'username': username, 'password': password}
-            response = self.session.post(
-                'https://www.instagram.com/accounts/login/ajax/', data=self.credentials, allow_redirects=True)
+            response = self.session.post('https://www.instagram.com/accounts/login/ajax/', data=self.credentials, allow_redirects=True)
 
             if response.status_code == 200:
-                self.session.headers.update(
-                    {'x-ig-app-id': '936619743392459', 'X-CSRFToken': response.cookies['csrftoken'], 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'})
+                self.session.headers.update({'x-ig-app-id': '936619743392459', 'X-CSRFToken': response.cookies['csrftoken'], 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'})
                 self.cookies = response.cookies
                 response = response.json()
                 if response['authenticated']:
@@ -53,8 +51,7 @@ class InstagramCLI():
             else:
                 if "two_factor_required" in response.json():
                     # Two factor authentication is enabled for your account. Please disable it for sometime. You can enable it again after finishing scraping. Its not like i can't add input() to accept otp. It's just that taking user otp input while program execution feels different. Eg. I mean if someone includes this library in their code and the program just stops to take input() the whole process will stop. Then there is no point in making an automated library. In future if i feel to add it i will surely add this functionality. But for now its not there.
-                    raise Exception(
-                        "Two factor authentication is enabled. Please disable it.")
+                    raise Exception("Two factor authentication is enabled. Please disable it.")
                 else:
                     raise Exception("Login Failed")
         except Exception as e:
@@ -65,6 +62,46 @@ class InstagramCLI():
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         logging.error("\nError in %s function at line %s.\nError Message - %s\nType - %s\nPlease try again. If issue persists,then open github issue and upload error snapshot - https://github.com/suyashjawale/InstagramCLI/issues""", message, exc_tb.tb_lineno, e, exc_type)
         exit()
+
+    def make_folder(self,optimized):
+        try:
+            dt_string = ""
+            if optimized['timestamp_folder']:
+                dt_string = optimized['dt_string']
+            path = os.path.join(os.getcwd(), optimized['folder'] ,f"{optimized['sub_folder']}{dt_string}")
+            if not os.path.isdir(path):
+                os.makedirs(path)
+        except Exception as e:
+            self.error_smaco(e,"make_folder")
+
+    def save_json(self, optimized, data):
+        try:
+            dt_string = ""
+            dt_file = ""
+
+            if optimized['timestamp_folder']:
+                dt_string = optimized['dt_string']            
+            
+            if optimized['timestamp_file']:
+                dt_file = optimized['dt_string']
+
+            path = os.path.join(os.getcwd(),optimized['folder'],f"{optimized['sub_folder']}{dt_string}", f"{optimized['filename']}{dt_file}.json")
+
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=4)
+        except Exception as e:
+            self.error_smaco(e,"save_json")
+
+    def download(self, url, optimized, filename, ext):
+        try:
+            dt_string = ""
+            if optimized['timestamp_folder']:
+                dt_string = optimized['dt_string']
+            path = os.path.join(os.getcwd(), optimized['folder'] ,f"{optimized['sub_folder']}{dt_string}",f"{filename}.{ext}")
+            if not os.path.isfile(path):
+                urllib.request.urlretrieve(url, path)
+        except Exception as e:
+            self.error_smaco(e, "download")
 
     def get_info(self, username=None):
         try:
@@ -81,17 +118,35 @@ class InstagramCLI():
         except Exception as e:
             self.error_smaco(e, "__init__")
 
-    def save_json(self, filename, data):
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4)
+    def get_following(self, username=None, save=True, optimzations={}):
+        now = datetime.now()
+        dt_string = now.strftime("_%d_%m_%Y_%H_%M_%S")
+        optimzed = {
+            "count" : optimzations.get("count","all"),
+            "folder" : optimzations.get("folder",username),
+            "sub_folder" : optimzations.get("sub_folder","following"),
+            "filename" : optimzations.get("filename", f"{username}_following"),
+            "timestamp_folder" : optimzations.get("timestamp_folder",False),
+            "timestamp_file" : optimzations.get("timestamp_file",False),
+            "dt_string" : dt_string
+        }
+        return self.get_users(username, save, cli_context="following",optimized=optimzed)
 
-    def get_following(self, username=None, save=True):
-        return self.get_users(username, save, cli_context="following")
+    def get_followers(self, username=None, save=True, optimzations={}):
+        now = datetime.now()
+        dt_string = now.strftime("_%d_%m_%Y_%H_%M_%S")
+        optimzed = {
+            "count" : optimzations.get("count","all"),
+            "folder" : optimzations.get("folder",username),
+            "sub_folder" : optimzations.get("sub_folder","followers"),
+            "filename" : optimzations.get("filename", f"{username}_followers"),
+            "timestamp_folder" : optimzations.get("timestamp_folder",False),
+            "timestamp_file" : optimzations.get("timestamp_file",False),
+            "dt_string" : dt_string
+        }
+        return self.get_users(username, save, cli_context="followers",optimized=optimzed)
 
-    def get_followers(self, username=None, save=True):
-        return self.get_users(username, save, cli_context="followers")
-
-    def get_users(self, username, save, cli_context):
+    def get_users(self, username, save, cli_context, optimized):
         try:
             if username != None:
                 user_info, status = self.get_info(username)
@@ -100,25 +155,31 @@ class InstagramCLI():
                     users = []
                     res = {"next_max_id": None}
                     user_id = user_info['data']['user']['id']
-                    logging.info(f"Fetching {cli_context} data")
+                    logging.info(f"Fetching {username} {cli_context} data")
+                    if optimized['count']=="all":
+                        optimized['count'] = int(user_info['data']['user']['edge_follow']['count'])
                     search_surface = None
                     if cli_context == "followers":
                         search_surface = "follow_list_page"
                     try:
-                        while big_list:
+                        self.counter=0
+                        while big_list and self.counter<optimized['count']:
                             payload = {
                                 "count": 12,
                                 "max_id": res['next_max_id'],
                                 "search_surface": search_surface
                             }
+                            self.counter+=12
                             res = self.session.get(
                                 f"https://i.instagram.com/api/v1/friendships/{user_id}/{cli_context}/", cookies=self.cookies, params=payload).json()
                             big_list = res['big_list']
                             users.extend(res['users'])
-                    except:
+                    except Exception as e:
+                        self.error_smaco(e,"")
                         logging.error(f'Cannot scrape user {cli_context}.')
                     if save:
-                        self.save_json(f'{username}_{cli_context}.json', users)
+                        self.make_folder(optimized)
+                        self.save_json(optimized, data=users)
                     return users
                 else:
                     return []
@@ -128,7 +189,7 @@ class InstagramCLI():
         except Exception as e:
             self.error_smaco(e, f"get_{cli_context}")
 
-    def search(self, query=None, save=True, save_photos=False):
+    def search(self, query=None, save=True, optimizations={}):
         try:
             if query != None:
                 payload = {
@@ -137,39 +198,51 @@ class InstagramCLI():
                     "rank_token": 0.9938973991144522,
                     "include_reel": "true"
                 }
-                res = self.session.get(
-                    "https://i.instagram.com/api/v1/web/search/topsearch/", cookies=self.cookies, params=payload)
-                res = res.json()
-                folder = f"{query}_search_results"
+                res = self.session.get("https://i.instagram.com/api/v1/web/search/topsearch/", cookies=self.cookies, params=payload)
+                if res.status_code==200:
+                    optimized = {
+                        "raw_response" : optimizations.get("raw_response",False), 
+                        "count" : optimizations.get("count","all"),
+                        "save_sd_photo" : optimizations.get("save_sd_photo",False),
+                        "save_hd_photo" : optimizations.get("save_hd_photo", False),
+                        "folder" : optimizations.get("folder", query),
+                        "sub_folder" : optimizations.get("sub_folder", "search"),
+                        "filename" : optimizations.get("filename", f"{query}_results"),
+                        "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                        "timestamp_file" : optimizations.get("timestamp_file",False),
+                        "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S")
+                    }
+                    if optimized['count']=="all":
+                        optimized['count']=100000
+                    res = res.json()
+                    logging.info("Fetching data")
+                    self.make_folder(optimized)
+                    self.posts=[]
+
+                    for j,i in enumerate(res['users']):
+                        if not optimized['raw_response']:
+                            self.posts.append(i)
+                        if j==optimized['count']:
+                            break
+                        if optimized['save_sd_photo']:
+                            self.download(i['user']['profile_pic_url'],optimized,f"{i['user']['username']}_sd","png")
+                        if optimized['save_hd_photo']:
+                            user_info, _ = self.get_info(i['user']['username'])
+                            self.download(user_info['data']['user']['profile_pic_url_hd'],optimized,f"{i['user']['username']}_hd","png")
+                    if optimized['raw_response']:
+                        self.posts= res
+                else:
+                    logging.error("Error. Please try again")
+                
                 if save:
-                    self.save_json(f'{folder}.json', res)
-                if save_photos:
-                    if not os.path.exists(folder):
-                        os.mkdir(folder)
-                    for i in res['users']:
-                        img = requests.get(
-                            i['user']['profile_pic_url'], stream=True)
-                        # with open(f"{folder}/{i['user']['username']}.jpg",'wb') as f:
-                        #     shutil.copyfileobj(img.raw, f)
-                return res
+                    self.save_json(optimized, self.posts)
+                return self.posts
             else:
                 # Now here you might feel why i have added return instead of raising exception. Cause if someone is running multiple functions and if one function raised exception. the whole program will exit(). Cause the error_smaco has an exit() in it. But for login functionality. I have added exception as there is no point in moving forward if error occurs.
                 logging.error("Invalid query")
                 return []
         except Exception as e:
             self.error_smaco(e, "search")
-
-    def download(self, url, folder, fname, ext):
-        try:
-            pat = re.compile(r'[^a-zA-Z0-9_ -]+')
-            fname = re.sub(pat, '', fname)
-            path = f"{folder}/{fname}.{ext}"
-            if not os.path.isfile(path):
-                urllib.request.urlretrieve(url, path)
-        except Exception as e:
-            logging.error(e)
-            logging.error(path)
-            self.error_smaco(e, "download")
 
     def abstraction(self, response, optimized, single_post):
         try:
@@ -178,7 +251,7 @@ class InstagramCLI():
             if response['media_type'] == 1 and (optimized['media_type'] == "photo" or optimized['media_type'] == "both"):
                 img_url = response['image_versions2']['candidates'][0]['url']
                 if optimized['save_photo']:
-                    self.download(img_url, optimized['folder'], post_id, 'png')
+                    self.download(img_url, optimized, post_id, 'png')
                 if not optimized['raw_response']:
                     accessibility_caption = response.get(
                         "accessibility_caption", "None")
@@ -212,14 +285,14 @@ class InstagramCLI():
 
                         if optimized['save_music']:
                             self.download(
-                                music_url['music_asset_info']['fast_start_progressive_download_url'], optimized['folder'], music_name, 'mp3')
+                                music_url['music_asset_info']['fast_start_progressive_download_url'], optimized,music_name, 'mp3')
 
                 if optimized['save_video']:
                     self.download(
-                        video_url, optimized['folder'], post_id, 'mp4')
+                        video_url, optimized ,post_id, 'mp4')
                 if optimized['save_video_thumbnail']:
                     self.download(
-                        thumbnail, optimized['folder'], f"{post_id}_thumbnail", 'png')
+                        thumbnail, optimized ,f"{post_id}_thumbnail", 'png')
                 if not optimized['raw_response']:
                     self.posts['video'].append(
                         {**single_post, **{"post_id": post_id, "thumbnail": thumbnail, "video_url": video_url}})
@@ -263,21 +336,20 @@ class InstagramCLI():
                 user_info, status = self.get_info(username)
                 if status:
                     optimized = {
-                        # True - response which is received from instagram api, False - Minified response
                         "raw_response": optimizations.get("raw_response", False),
-                        # Type of post - image, video, both
                         "media_type": optimizations.get("media_type", "both"),
-                        # how many posts to download. Each media inside carousel is single post.
                         "count": optimizations.get("count", 24),
-                        # save_photo - if post is a photo save it to device
                         "save_photo": optimizations.get("save_photo", False),
-                        # save_video - if post is a video save it to device
                         "save_video": optimizations.get("save_video", False),
-                        # save_video_thumbnail - save thumbnail of video to device
                         "save_video_thumbnail": optimizations.get("save_video_thumbnail", False),
-                        "folder":  optimizations.get("folder", f"{username}_posts"),
+                        "folder":  optimizations.get("folder", username),
+                        "sub_folder":  optimizations.get("sub_folder", "posts"),
+                        "filename" : optimizations.get("filename", f"{username}_posts"),
                         "save_music": False,
-                        "context": "posts"
+                        "context": "posts",
+                        "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                        "timestamp_file" : optimizations.get("timestamp_file",False),
+                        "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S")
                     }
                     if optimized['count'] == "all":
                         try:
@@ -286,9 +358,7 @@ class InstagramCLI():
                         except:
                             optimized['count'] = 100000
 
-                    if optimized['save_photo'] or optimized['save_video'] or optimized['save_video_thumbnail']:
-                        if not os.path.exists(optimized['folder']):
-                            os.mkdir(optimized['folder'])
+                    self.make_folder(optimized)
                     self.posts = {"image": [], "video": []}
                     if optimized['raw_response']:
                         self.posts = []
@@ -319,7 +389,7 @@ class InstagramCLI():
                         logging.error(
                             f'Execution terminated. Reasons - Limit Reached | Private account | Only God knows')
                     if save:
-                        self.save_json(f'{username}_posts.json', self.posts)
+                        self.save_json(optimized, self.posts)
                     return self.posts
                 else:
                     return []
@@ -342,16 +412,19 @@ class InstagramCLI():
                         "save_video": optimizations.get("save_video", False),
                         "save_video_thumbnail": optimizations.get("save_video_thumbnail", False),
                         "save_music": optimizations.get("save_music", False),
-                        "folder": optimizations.get("folder", f"{username}_reels"),
-                        "context": "reels"
+                        "folder": optimizations.get("folder", username),
+                        "filename" : optimizations.get("filename",f"{username}_reels"),
+                        "sub_folder": optimizations.get("sub_folder", "reels"),
+                        "context": "reels",
+                        "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                        "timestamp_file" : optimizations.get("timestamp_file",False),
+                        "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S")
                     }
 
                     if optimized['count'] == "all":
                         optimized['count'] = 100000
 
-                    if optimized['save_video'] or optimized['save_video_thumbnail']:
-                        if not os.path.exists(optimized['folder']):
-                            os.mkdir(optimized['folder'])
+                    self.make_folder(optimized)
 
                     self.posts = {"image": [], "video": []}
                     if optimized['raw_response']:
@@ -387,7 +460,7 @@ class InstagramCLI():
                         logging.error(
                             f'Execution terminated. Reasons - Limit Reached | Private account | Only God knows')
                     if save:
-                        self.save_json(f'{username}_reels.json', self.posts)
+                        self.save_json(optimized, self.posts)
                     return self.posts
                 else:
                     return []
@@ -404,20 +477,23 @@ class InstagramCLI():
                 optimized = {
                     "raw_response": optimizations.get("raw_response", False),
                     "media_type": "video",
-                    "count": optimizations.get("count", 18),
+                    "count": optimizations.get("count", 30),
                     "save_video": optimizations.get("save_video", False),
                     "save_video_thumbnail": optimizations.get("save_video_thumbnail", False),
                     "save_music": optimizations.get("save_music", False),
-                    "folder": optimizations.get("folder", f"{music_id}_reels"),
-                    "context": "reels"
+                    "folder": optimizations.get("folder", music_id),
+                    "filename" : optimizations.get("filename", f"{music_id}_reels"),
+                    "sub_folder": optimizations.get("sub_folder", "reels"),
+                    "context": "reels",
+                    "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                    "timestamp_file" : optimizations.get("timestamp_file",False),
+                    "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S")
                 }
 
                 if optimized['count'] == "all":
                     optimized['count'] = 100000
 
-                if optimized['save_video'] or optimized['save_video_thumbnail']:
-                    if not os.path.exists(optimized['folder']):
-                        os.mkdir(optimized['folder'])
+                self.make_folder(optimized)
 
                 self.posts = {"image": [], "video": []}
                 if optimized['raw_response']:
@@ -444,17 +520,13 @@ class InstagramCLI():
                             self.posts.extend(res['items'])
                         elif optimized['raw_response']:
                             self.posts.extend(res['items'])
-                            self.extract_media([i['media']
-                                               for i in res['items']], optimized)
+                            self.extract_media([i['media'] for i in res['items']], optimized)
                         else:
-                            self.extract_media([i['media']
-                                               for i in res['items']], optimized)
+                            self.extract_media([i['media'] for i in res['items']], optimized)
                 except Exception as e:
-                    logging.error(
-                        f'Execution terminated. Reasons - Limit Reached | Private account | Only God knows')
-
+                    logging.error(f'Execution terminated. Reasons - Limit Reached | Private account | Only God knows')
                 if save:
-                    self.save_json(f"{music_id}_reels.json", self.posts)
+                    self.save_json(optimized, self.posts)
                 return self.posts
             else:
                 # Now here you might feel why i have added return instead of raising exception. Cause if someone is running multiple functions and if one function raised exception. the whole program will exit(). Cause the error_smaco has an exit() in it. But for login functionality. I have added exception as there is no point in moving forward if error occurs.
@@ -469,34 +541,29 @@ class InstagramCLI():
                 user_info, status = self.get_info(username)
                 if status:
                     optimized = {
-                        # True - response which is received from instagram api, False - Minified response
+
                         "raw_response": optimizations.get("raw_response", False),
-                        # Type of post - image, video, both
                         "media_type": optimizations.get("media_type", "both"),
-                        # how many posts to download. Each media inside carousel is single post.
-                        "count": optimizations.get("count", 24),
-                        # save_photo - if post is a photo save it to device
                         "save_photo": optimizations.get("save_photo", False),
-                        # save_video - if post is a video save it to device
                         "save_video": optimizations.get("save_video", False),
-                        # save_video_thumbnail - save thumbnail of video to device
                         "save_video_thumbnail": optimizations.get("save_video_thumbnail", False),
-                        "folder":  optimizations.get("folder", f"{username}_story"),
+                        "folder":  optimizations.get("folder", username),
+                        "sub_folder":  optimizations.get("sub_folder", "story"),
                         "save_music": False,
+                        "filename" : optimizations.get("filename", f"{username}_story"),
+                        "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                        "timestamp_file" : optimizations.get("timestamp_file",False),
+                        "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S"),
                         "context": "posts"
                     }
 
-                    if optimized['count'] == "all":
-                        optimized['count'] = 1000
                     user_id = user_info['data']['user']['id']
                     payload = {
                         "reel_ids": user_id
                     }
                     self.counter = 0
                     logging.info("Fetching Data")
-                    if optimized['save_photo'] or optimized['save_video'] or optimized['save_video_thumbnail']:
-                        if not os.path.exists(optimized['folder']):
-                            os.mkdir(optimized['folder'])
+                    self.make_folder(optimized)
                     self.posts = {"image": [], "video": []}
 
                     if optimized['raw_response']:
@@ -518,8 +585,7 @@ class InstagramCLI():
                             self.extract_media(res['items'], optimized)
 
                         if save:
-                            self.save_json(
-                                f'{username}_story.json', self.posts)
+                            self.save_json(optimized, self.posts)
                         return self.posts
                     else:
                         logging.error("Error. while fetching stories")
@@ -582,9 +648,15 @@ class InstagramCLI():
                     "instagram://media?id=", "")
                 optimized = {
                     "raw_response": optimizations.get("raw_response", False),
-                    "count": optimizations.get("count", 50),
+                    "count": optimizations.get("count", 60),
                     "child_comments": optimizations.get("child_comments", False),
-                    "post_id": post_id
+                    "folder" : optimizations.get("folder",shortcode),
+                    "filename" : optimizations.get("filename",f"{shortcode}_comments"),
+                    "sub_folder" : optimizations.get("sub_folder","comments"),
+                    "post_id": post_id,
+                    "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                    "timestamp_file" : optimizations.get("timestamp_file",False),
+                    "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S"),
                 }
                 more_available = True
                 self.counter = 0
@@ -594,6 +666,7 @@ class InstagramCLI():
                 self.counter = 0
                 self.comments = []
                 logging.info("Fetching data")
+                self.make_folder(optimized)
                 try:
                     while more_available and self.counter < optimized['count']:
                         payload = {
@@ -604,7 +677,7 @@ class InstagramCLI():
                             f"https://i.instagram.com/api/v1/media/{post_id}/comments/", cookies=self.cookies, params=payload).json()
                         more_available = res['has_more_headload_comments']
                         if optimized['raw_response'] and optimized['fetch_child_comments'] == False:
-                            self.counter += 20
+                            self.counter += len(res['comments'])
                             self.comments.extend(res['comments'])
                         else:
                             self.extract_comments(res['comments'], optimized)
@@ -612,7 +685,7 @@ class InstagramCLI():
                     logging.error(
                         f'Execution terminated. Reasons - Limit Reached | Private account | Only God knows')
                 if save:
-                    self.save_json(f'{shortcode}_comments.json', self.comments)
+                    self.save_json(optimized, self.comments)
                 return self.comments
             else:
                 # Now here you might feel why i have added return instead of raising exception. Cause if someone is running multiple functions and if one function raised exception. the whole program will exit(). Cause the error_smaco has an exit() in it. But for login functionality. I have added exception as there is no point in moving forward if error occurs.
@@ -627,18 +700,22 @@ class InstagramCLI():
                 user_info, status = self.get_info(username)
                 if status:
                     user_id = user_info['data']['user']['id']
-
                     optimized = {
                         "raw_response": optimizations.get("raw_response", False),
                         "media_type": optimizations.get("media_type", "both"),
-                        "highlight_count": optimizations.get("highlight_count", 3),
-                        "story_count": optimizations.get("story_count", "all"),
+                        "highlight_count": optimizations.get("highlight_count", 4),
+                        "story_count": optimizations.get("story_count", 10),
                         "save_photo": optimizations.get("save_photo", False),
                         "save_video": optimizations.get("save_video", False),
                         "save_video_thumbnail": optimizations.get("save_video_thumbnail", False),
-                        "folder":  optimizations.get("folder", f"{username}_highlights"),
+                        "folder":  optimizations.get("folder", username),
+                        "sub_folder":  optimizations.get("sub_folder", "highlights"),
                         "save_music": False,
-                        "context": "posts"
+                        "filename" : f"{username}_highlights",
+                        "context": "posts",
+                        "timestamp_folder" : optimizations.get("timestamp_folder",False),
+                        "timestamp_file" : optimizations.get("timestamp_file",False),
+                        "dt_string" : datetime.now().strftime("_%d_%m_%Y_%H_%M_%S")
                     }
 
                     if optimized['highlight_count'] == "all":
@@ -650,46 +727,46 @@ class InstagramCLI():
                     user_id = user_info['data']['user']['id']
                     self.counter = 0
                     logging.info("Fetching Data")
-                    if optimized['save_photo'] or optimized['save_video'] or optimized['save_video_thumbnail']:
-                        if not os.path.exists(optimized['folder']):
-                            os.mkdir(optimized['folder'])
+                    self.make_folder(optimized)
                     self.posts = {"image": [], "video": []}
 
                     if optimized['raw_response']:
                         self.posts = []
 
-                    res = self.session.get(
-                        f"https://www.instagram.com/graphql/query/?query_hash=d4d88dc1500312af6f937f7b804c68c3&variables=%7B%22user_id%22%3A%22{user_id}%22%2C%22include_chaining%22%3Afalse%2C%22include_reel%22%3Afalse%2C%22include_suggested_users%22%3Afalse%2C%22include_logged_out_extras%22%3Afalse%2C%22include_highlight_reels%22%3Atrue%2C%22include_live_status%22%3Afalse%7D", cookies=self.cookies)
+                    res = self.session.get(f"https://www.instagram.com/graphql/query/?query_hash=d4d88dc1500312af6f937f7b804c68c3&variables=%7B%22user_id%22%3A%22{user_id}%22%2C%22include_chaining%22%3Afalse%2C%22include_reel%22%3Afalse%2C%22include_suggested_users%22%3Afalse%2C%22include_logged_out_extras%22%3Afalse%2C%22include_highlight_reels%22%3Atrue%2C%22include_live_status%22%3Afalse%7D", cookies=self.cookies)
 
                     highlights = {}
                     if res.status_code == 200:
                         res = res.json()
-                        res = "&".join(
-                            [f"reel_ids=highlight%3A{i['node']['id']}" for i in res['data']['user']['edge_highlight_reels']['edges']])
-
-                        res = self.session.get(
-                            f"https://i.instagram.com/api/v1/feed/reels_media/?{res}", cookies=self.cookies)
-
-                        if res.status_code == 200:
-                            res = res.json()
-                            if optimized['raw_response'] and optimized['media_type'] == "both" and optimized['save_photo'] == False and optimized['save_video'] == False and optimized['save_video_thumbnail'] == False:
-                                for i in res['reels_media']:
-                                    highlights[i['title']] = i['items']
-                            elif optimized['raw_response']:
-                                for i in res['reels_media']:
-                                    highlights[i['title']] = i['items']
-                                    self.extract_media(i['items'], optimized)
+                        lists = [i['node']['id'] for i in res['data']['user']['edge_highlight_reels']['edges']][:optimized['highlight_count']]
+                        batch = 3
+                        for travel in range(0,len(lists),batch):
+                            res = "&".join([f"reel_ids=highlight%3A{i}" for i in lists[travel:travel + batch]])
+                            res = self.session.get(f"https://i.instagram.com/api/v1/feed/reels_media/?{res}", cookies=self.cookies)
+                            if res.status_code == 200:
+                                res = res.json()
+                                if optimized['raw_response'] and optimized['media_type'] == "both" and optimized['save_photo'] == False and optimized['save_video'] == False and optimized['save_video_thumbnail'] == False:
+                                    for i in res['reels_media']:
+                                        highlights[i['title']] = i['items']
+                                elif optimized['raw_response']:
+                                    for i in res['reels_media']:
+                                        items = i['items']
+                                        max_len = len(items) if optimized['story_count']>=len(items) else optimized['story_count']
+                                        highlights[i['title']] = items[:max_len]
+                                        self.extract_media(items[:max_len], optimized)
+                                else:
+                                    for i in res['reels_media']:
+                                        items = i['items']
+                                        max_len = len(items) if optimized['story_count']>=len(items) else optimized['story_count']
+                                        highlights[i['title']] = items[:max_len]
+                                        self.posts = {"image": [], "video": []}
+                                        self.extract_media(items[:max_len], optimized)
+                                        highlights[i['title']] = self.posts
                             else:
-                                for i in res['reels_media']:
-                                    self.posts = {"image": [], "video": []}
-                                    self.extract_media(i['items'], optimized)
-                                    highlights[i['title']] = self.posts
-                        else:
-                            logging.error("OOPS error occured")
+                                logging.error("aOOPS error occured")
 
                         if save:
-                            self.save_json(
-                                f'{username}_highlights.json', highlights)
+                            self.save_json(optimized, highlights)
                         return highlights
                     else:
                         logging.error("Error. while fetching stories")
