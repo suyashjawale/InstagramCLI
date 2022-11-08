@@ -352,5 +352,42 @@ data= cli.get_similar_reels(music_id="1184871695410444",optimizations=optimizati
 ####
 _________________________
 
+### 9. search()
+Scrape account highlights media and metadata
+```
+search(query, save, optimizations)
+```
+| Parameter |   Type | Description       | Values    | Default Value     |
+|---    |--- |---   |---    |---    |
+|query |  string | search query     | --    | --    |
+|save   | boolean | Save list to json file | **True** or **False** | **True**|
+|**optimizations**   | dictionary | Additional params for nerds | shown below | |
+
+##### Optimizations
+#
+|Param|Type|Description|Value|Default|
+|--- |--- |--- |--- |--- |
+|raw_response|**boolean**|Response received from instagram|**True** or **False**|**False**|
+|count|**string** or **number**|Count of highlights|**all** or **number**|**4**|
+|save_hd_photo|**boolean**|Save high quality profile photo - expensive operation|**True** or **False**|**False**|
+|save_sd_photo|**boolean**|Save regular quality profile photo|**True** or **False**|**False**|
+|folder|**string**|Custom folder name|Anything you want|**query**|
+|sub_folder|**string**|Custom sub folder name|Anything you want|**search**|
+|filename|**string**|Custom file name|Anything you want|**username_highlights**|
+|timestamp_folder|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+|timestamp_file|**boolean**|Append current date & time to folder|**True** or **False**|**False**|
+
+#### Example 
+```python
+from InstagramCLI import InstagramCLI
+cli = InstagramCLI(username="your_username", password="your_password")
+optimizations = {
+    "save_hd_photo" : True
+}
+data= cli.get_highlights(username="rashmika mandanna",optimizations=optimizations)
+
+```
+
+
 ## License
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/suyashjawale/InstagramCLI/blob/main/LICENSE)
