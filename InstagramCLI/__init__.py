@@ -573,17 +573,19 @@ class InstagramCLI():
 
                     if res.status_code == 200:
                         res = res.json()
-                        res = res['reels_media'][0]
-                        if optimized['raw_response'] and optimized['media_type'] == "both" and optimized['save_photo'] == False and optimized['save_video'] == False and optimized['save_video_thumbnail'] == False:
-                            self.posts.extend(res['items'])
+                        if res['reels_media']:
+                            res = res['reels_media'][0]
+                            if optimized['raw_response'] and optimized['media_type'] == "both" and optimized['save_photo'] == False and optimized['save_video'] == False and optimized['save_video_thumbnail'] == False:
+                                self.posts.extend(res['items'])
 
-                        elif optimized['raw_response']:
-                            self.posts.extend(res['items'])
-                            self.extract_media(res['items'], optimized)
+                            elif optimized['raw_response']:
+                                self.posts.extend(res['items'])
+                                self.extract_media(res['items'], optimized)
 
+                            else:
+                                self.extract_media(res['items'], optimized)
                         else:
-                            self.extract_media(res['items'], optimized)
-
+                            logging.info("No stories available. | Account is private.")
                         if save:
                             self.save_json(optimized, self.posts)
                         return self.posts
