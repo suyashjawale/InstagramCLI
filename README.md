@@ -1,3 +1,4 @@
+## Deprecated : Instagram changed its apis. Have lost motivation to work on this now.
 # InstagramCLI 
 CLI tool made by reverse engineering Instagram API calls.
 
